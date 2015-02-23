@@ -17,8 +17,10 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     ACFFactors.cpp \
-    IInput.cpp
+    IInput.cpp \
+    FileInput.cpp
 
 HEADERS += \
     ACFFactors.h \
-    IInput.h
+    IInput.h \
+    FileInput.h

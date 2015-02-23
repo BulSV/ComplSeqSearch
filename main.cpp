@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <QVector>
 #include "ACFFactors.h"
+#include "IInput.h"
+#include "FileInput.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +22,12 @@ int main(int argc, char *argv[])
     for(int k = 0; k < factors.size(); ++k) {
         qDebug() << "ACF(" << k << ") =" << factors.at(k);
     }
+
+    qDebug() << "TESTING FILE INPUTING";
+    IInput *input = new FileInput("Test.txt");
+    input->inputSeq();
+    qDebug() << "NUMBER OF SEQS:" << input->seqs().size();
+    qDebug() << input->seqs();
 
     return a.exec();
 }
