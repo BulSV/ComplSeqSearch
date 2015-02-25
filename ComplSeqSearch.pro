@@ -18,9 +18,11 @@ TEMPLATE = app
 SOURCES += main.cpp \
     ACFFactors.cpp \
     IInput.cpp \
-    FileInput.cpp
+    FileInput.cpp \
+    ComplGen.cpp
 
 HEADERS += \
     ACFFactors.h \
     IInput.h \
-    FileInput.h
+    FileInput.h \
+    ComplGen.h
