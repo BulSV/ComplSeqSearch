@@ -67,6 +67,9 @@ bool FileInput::sequenceReader(QVector<int> &vec, int &pos)
         } else {
             qDebug() << "\nError! The sequence" << ba << "has no size set!\n";
         }
+    } else if(ba.contains("DCB")) {
+        ba.remove(0, 3);
+        sequenceReaderDCB(ba, vec);
     } else if(!ba.isEmpty()){
         qDebug() << "\nError! The sequence" << ba << "is not valid!";
         qDebug() << "For HEX-format sequence write in file at the begin of line: HEX";
@@ -212,5 +215,33 @@ bool FileInput::sequenceReaderBIN(const QByteArray &ba, QVector<int> &vec)
         }
     }
 
+    return true;
+}
+
+bool FileInput::sequenceReaderDCB(const QByteArray &ba, QVector<int> &vec)
+{
+    QVector<int> numbers;
+    QByteArray tempArr;
+    qDebug() << "BA" << ba;
+
+    for(int i = 0; i < ba.size(); ++i) {
+        if(ba.at(i) != ',' && ba.at(i) != '.') {
+            tempArr.append(ba.at(i));
+        } else {
+            numbers.push_back(tempArr.toInt());
+            tempArr.clear();
+        }
+    }
+    qDebug() << "numbers" << numbers;
+    for(int i = 0; i < numbers.size(); ++i) {
+        for(int j = 0; j < numbers.at(i); ++j) {
+            if(i % 2) {
+                vec.push_back(1);
+            } else {
+                vec.push_back(-1);
+            }
+        }
+    }
+    qDebug() << "ORIGIN" << vec;
     return true;
 }

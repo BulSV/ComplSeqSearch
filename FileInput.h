@@ -23,6 +23,7 @@ private:
     bool sequenceReader(QVector<int> &vec, int &pos);
     bool sequenceReaderHEX(const QByteArray &ba, QVector<int> &vec, const int &size);
     bool sequenceReaderBIN(const QByteArray &ba, QVector<int> &vec);
+    bool sequenceReaderDCB(const QByteArray &ba, QVector<int> &vec);
 };
 
 #endif // FILEINPUT_H
