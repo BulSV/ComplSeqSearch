@@ -14,6 +14,7 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+DEFINES = DEBUG
 
 SOURCES += main.cpp \
     ACFFactors.cpp \

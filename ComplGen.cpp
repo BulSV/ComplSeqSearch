@@ -76,38 +76,48 @@ int ComplGen::getTerminalSideLobes() const
     return m_terminalSideLobes;
 }
 
-void ComplGen::generate()
+QVector<QVector<int> > ComplGen::generate()
 {
     int phase = m_seqSize - 1;
     QVector<int> sequence;
     QVector<QFuture<void> > fs;
 
     sequence.fill(0, m_seqSize);
-    for(int combIndex = 0; combIndex < m_combSizeSimplified; combIndex += 2) {
-        sequence[m_seqSize - phase - 1] = m_combsSimplified[combIndex];
-        sequence[phase] = m_combsSimplified[combIndex + 1];
-        m_tempSequences.append(sequence);
-    }
+//    for(int combIndex = 0; combIndex < m_combSizeSimplified; combIndex += 2) {
+//        sequence[m_seqSize - phase - 1] = m_combsSimplified[combIndex];
+//        sequence[phase] = m_combsSimplified[combIndex + 1];
+//        m_tempSequences.append(sequence);
+//    }
 
-    for(int i = 0; i < m_combSizeSimplified/2; ++i) {
-        fs.append(QtConcurrent::run(this, &ComplGen::gen, phase - 1, m_tempSequences[i], true));
-    }
+//    for(int i = 0; i < m_combSizeSimplified/2; ++i) {
+//        fs.append(QtConcurrent::run(this, &ComplGen::gen, phase - 1, m_tempSequences[i], true));
+//    }
 
-    for(int i = 0; i < m_combSizeSimplified/2; ++i) {
-        fs[i].waitForFinished();
-    }
+//    for(int i = 0; i < m_combSizeSimplified/2; ++i) {
+//        fs[i].waitForFinished();
+//    }
 //    for(int i = 0; i < m_combSizeSimplified/2; ++i) {
 //        gen(phase - 1, m_tempSequences[i], true);
 //    }
+
+    gen(phase, sequence, false);
+    return m_sequences;
 }
 
 void ComplGen::gen(int phase, QVector<int> &seq, bool isSimplified)
 {
     int summa = 0;
-
-    if(phase >= phaseLimit()
-            && ((!isOddSeqSize() && phase < m_seqSize - 2)
-                || (isOddSeqSize() && phase < m_seqSize - 1))) {
+#ifdef DEBUG
+    qDebug() << "IN void ComplGen::gen()";
+    qDebug() << "phase =" << phase;
+    qDebug() << "phaseLimit() =" << phaseLimit();
+#endif
+    if(phase >= phaseLimit() && phase < m_seqSize/* - 1*/
+            /*&& ((!isOddSeqSize() && phase < m_seqSize - 2)
+                || (isOddSeqSize() && phase < m_seqSize - 1))*/) {
+#ifdef DEBUG
+        qDebug() << "phase >= phaseLimit()";
+#endif
         if(isOddSeqSize() && (phase == phaseLimit())) {
             for(int combIndex = 0; combIndex < 2; ++combIndex) {
                 seq[phase] = qPow(-1, combIndex + 1);
@@ -115,15 +125,16 @@ void ComplGen::gen(int phase, QVector<int> &seq, bool isSimplified)
                 for(int index = 0; index < m_seqSize - phase; ++index) {
                     summa += seq.at(index)*seq.at(index + phase);
                 }
-
+#ifdef DEBUG
+                qDebug() << "summa =" << summa;
+                qDebug() << "m_originACFFactors.at(" << m_seqSize - phase - 1 << ") =" << m_originACFFactors.at(m_seqSize - phase - 1);
+                qDebug() << "m_terminalSideLobes =" << m_terminalSideLobes;
+#endif
                 if(qAbs(summa + m_originACFFactors.at(m_seqSize - phase - 1)) <= qAbs(m_terminalSideLobes)) {
                     gen(phase - 1, seq, isSimplified);
                 } else {
                     seq[phase] = 0;
                 }
-#ifdef DEBUG
-                qDebug() << "summa =" << summa;
-#endif
                 summa = 0;
             }
         } else if(isSimplified && !((seq.at(m_seqSize - phase - 1))^(seq.at(phase)))) {
@@ -134,16 +145,17 @@ void ComplGen::gen(int phase, QVector<int> &seq, bool isSimplified)
                 for(int index = 0; index < m_seqSize - phase; ++index) {
                     summa += seq.at(index)*seq.at(index + phase);
                 }
-
+#ifdef DEBUG
+                qDebug() << "summa =" << summa;
+                qDebug() << "m_originACFFactors.at(" << m_seqSize - phase - 1 << ") =" << m_originACFFactors.at(m_seqSize - phase - 1);
+                qDebug() << "m_terminalSideLobes =" << m_terminalSideLobes;
+#endif
                 if(qAbs(summa + m_originACFFactors.at(m_seqSize - phase - 1)) <= qAbs(m_terminalSideLobes)) {
                     gen(phase - 1, seq, isSimplified);
                 } else {
                     seq[m_seqSize - phase - 1] = 0;
                     seq[phase] = 0;
                 }
-#ifdef DEBUG
-                qDebug() << "summa =" << summa;
-#endif
                 summa = 0;
             }
         } else {
@@ -155,7 +167,11 @@ void ComplGen::gen(int phase, QVector<int> &seq, bool isSimplified)
                 for(int index = 0; index < m_seqSize - phase; ++index) {
                     summa += seq.at(index)*seq.at(index + phase);
                 }
-
+#ifdef DEBUG
+                qDebug() << "summa =" << summa;
+                qDebug() << "m_originACFFactors.at(" << m_seqSize - phase - 1 << ") =" << m_originACFFactors.at(m_seqSize - phase - 1);
+                qDebug() << "m_terminalSideLobes =" << m_terminalSideLobes;
+#endif
                 if(qAbs(summa + m_originACFFactors.at(m_seqSize - phase - 1)) <= qAbs(m_terminalSideLobes)) {
                     gen(phase - 1, seq, isSimplified);
                 } else {
@@ -193,7 +209,8 @@ bool ComplGen::filter(const QVector<int> &seq)
 #ifdef DEBUG
         qDebug() << "[!]*****bool ComplGen::filter():" << (qAbs(summa + m_originACFFactors.at(m_seqSize - phase - 1)) <= qAbs(m_closeCentralSideLobes));
         qDebug() << "[!]*****summa =" << summa;
-        qDebug() << "[!]*****bool ComplGen::filter() | phase:" << phase;
+        qDebug() << "[!]*****bool ComplGen::filter() | m_originACFFactors.at(" << m_seqSize - phase - 1 << "):" << m_originACFFactors.at(m_seqSize - phase - 1);
+        qDebug() << "[!]*****bool ComplGen::filter() | m_closeCentralSideLobes:" << m_closeCentralSideLobes;
 #endif
         if(qAbs(summa + m_originACFFactors.at(m_seqSize - phase - 1)) > qAbs(m_closeCentralSideLobes)) {
             return false;

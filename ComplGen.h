@@ -23,7 +23,7 @@ public:
     bool isFiltered() const;
     int getCloseCentralSideLobes() const;
     int getTerminalSideLobes() const;
-    void generate();
+    QVector<QVector<int> > generate();
     QVector<QVector<int> > getSequences() const;
 signals:
     void sequenceGenerated(QVector<int>);

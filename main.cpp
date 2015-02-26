@@ -16,8 +16,9 @@ int main(int argc, char *argv[])
     ComplGen *complGen = new ComplGen();
     complGen->setACFFactors(ACFFactors::valueFactors(input->seqs().at(0)));
     complGen->setFiltered(true);
-    complGen->generate();
-    qDebug() << "GENARATED SEQS:" << complGen->getSequences();
+//    complGen->generate();
+//    qDebug() << "GENARATED SEQS:" << complGen->getSequences();
+    qDebug() << "GENARATED SEQS:" << complGen->generate();
 
     return a.exec();
 }
